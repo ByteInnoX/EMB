@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+    <title>动物图像识别</title>
+</head>
+<body>
+<h1>动物图像识别</h1>
+<input type="file" id="imageInput" accept="image/*">
+<button id="uploadButton">上传图像</button>
+<div id="resultArea"></div>
+
+<script>
+    // 获取页面元素
+    const imageInput = document.getElementById('imageInput');
+    const uploadButton = document.getElementById('uploadButton');
+    const resultArea = document.getElementById('resultArea');
+
+    // 当用户选择图像时触发事件
+    imageInput.addEventListener('change', () => {
+        resultArea.innerHTML = ''; // 清空之前的结果
+    });
+
+    // 当用户点击上传按钮时触发事件
+    uploadButton.addEventListener('click', () => {
+        const file = imageInput.files[0];
+        if (!file) {
+            alert('请选择一个图像文件');
+            return;
+        }
+
+        // 创建一个 FormData 对象，用于将图像文件发送到后端
+        const formData = new FormData();
+        formData.append('image', file);
+
+        // 发送图像文件到后端
+        fetch('/api/recognize', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 处理后端返回的识别结果
+                if (data.error) {
+                    resultArea.innerHTML = '识别出错：' + data.error;
+                } else {
+                    resultArea.innerHTML = '动物类别：' + data.animal + '<br>置信度得分：' + data.confidence;
+                }
+            })
+            .catch(error => {
+                console.error('请求出错：', error);
+            });
+    });
+</script>
+</body>
+</html>
